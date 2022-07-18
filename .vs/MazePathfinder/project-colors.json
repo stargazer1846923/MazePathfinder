@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "e11ed935-c06a-46cf-96b2-5664bda0a032": {
+      "ProjectGuid": "e11ed935-c06a-46cf-96b2-5664bda0a032",
+      "DisplayName": "MazePathfinder",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
