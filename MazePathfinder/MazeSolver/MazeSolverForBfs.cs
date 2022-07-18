@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 
-namespace MazePathfinder
+namespace MazePathfinder.MazeSolver
 {
     /// <summary>
     /// 迷路探索アルゴリズム（幅優先探索を使用）
     /// </summary>
-    public class MazeSolver
+    public class MazeSolverForBfs
     {
         /// <summary>迷路配列</summary>
         private readonly int[,] maze;
@@ -28,12 +28,6 @@ namespace MazePathfinder
         /// <summary>探索の処理時間</summary>
         private readonly Stopwatch stopwatch;
 
-        /// <summary>ゴールできたかどうか</summary>
-        public static bool isGoaled = false;
-
-        /// <summary>探索を中止する</summary>
-        public static bool isCalculationCancel = false;
-
         /// <summary>探索処理のタイムアウト時間（秒）</summary>
         const int MAZE_TIMEOUT = 15;
 
@@ -45,7 +39,7 @@ namespace MazePathfinder
         /// <param name="startY">スタート地点の位置Y</param>
         /// <param name="gorlX">ゴール地点の位置X</param>
         /// <param name="gorlY">ゴール地点の位置Y</param>
-        public MazeSolver(int[,] mazeArray, int startX, int startY, int gorlX, int gorlY)
+        public MazeSolverForBfs(int[,] mazeArray, int startX, int startY, int gorlX, int gorlY)
         {
             maze = mazeArray;
             mazeWidth = (maze.GetLength(0) - 1);
@@ -58,19 +52,21 @@ namespace MazePathfinder
 
         /// <summary>
         /// 探索処理（幅優先探索を使用）
+        /// https://algoful.com/Archive/Algorithm/BFS
         /// </summary>
         public void Search()
         {
             stopwatch.Start();
 
-            isGoaled = false;
+            MainForm.isGoaled = false;
             Queue<Point> queue = new Queue<Point>();
             queue.Enqueue(startPoint);
 
-            visitedMazeArray = Enumerable.Repeat(-1, visitedMazeArray.Length).ToArray(); // 探索済配列を -1 で初期化
+            // 探索済配列を -1 で初期化
+            visitedMazeArray = Enumerable.Repeat(-1, visitedMazeArray.Length).ToArray();
             visitedMazeArray[ToIndex(startPoint)] = ToIndex(startPoint);
 
-            while (queue.Any() == true && !isGoaled == true)
+            while (queue.Any() == true && MainForm.isGoaled == false)
             {
                 Point target = queue.Dequeue();
 
@@ -117,7 +113,7 @@ namespace MazePathfinder
                             {
                                 queue.Clear();
                                 queue.Enqueue(nextPoint);
-                                isGoaled = true;
+                                MainForm.isGoaled = true;
                                 break;
                             }
                             else
@@ -129,7 +125,7 @@ namespace MazePathfinder
                 }
 
                 // 中止した場合、探索を中止する
-                if (isCalculationCancel == true)
+                if (MainForm.isCalculationCancel == true)
                 {
                     return;
                 }
@@ -140,7 +136,7 @@ namespace MazePathfinder
                     return;
                 }   
             }
-            if (isGoaled == true)
+            if (MainForm.isGoaled == true)
             {
                 SetRoute();
             }

@@ -48,6 +48,8 @@
             this.mazePathfinderPictureBox = new System.Windows.Forms.PictureBox();
             this.loadingNow = new System.Windows.Forms.PictureBox();
             this.calculationReject = new System.Windows.Forms.Button();
+            this.useBfsButton = new System.Windows.Forms.RadioButton();
+            this.useDfsButton = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.goalPosCross)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.startPosCross)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.startPos)).BeginInit();
@@ -322,6 +324,32 @@
             this.calculationReject.Visible = false;
             this.calculationReject.Click += new System.EventHandler(this.CalculationReject_Click);
             // 
+            // useBfsButton
+            // 
+            this.useBfsButton.AutoSize = true;
+            this.useBfsButton.Checked = true;
+            this.useBfsButton.Location = new System.Drawing.Point(439, 5);
+            this.useBfsButton.Name = "useBfsButton";
+            this.useBfsButton.Size = new System.Drawing.Size(122, 22);
+            this.useBfsButton.TabIndex = 18;
+            this.useBfsButton.TabStop = true;
+            this.useBfsButton.Text = "幅優先探索を使用";
+            this.useBfsButton.UseVisualStyleBackColor = true;
+            this.useBfsButton.Visible = false;
+            this.useBfsButton.CheckedChanged += new System.EventHandler(this.useBfsButton_CheckedChanged);
+            // 
+            // useDfsButton
+            // 
+            this.useDfsButton.AutoSize = true;
+            this.useDfsButton.Location = new System.Drawing.Point(439, 33);
+            this.useDfsButton.Name = "useDfsButton";
+            this.useDfsButton.Size = new System.Drawing.Size(134, 22);
+            this.useDfsButton.TabIndex = 19;
+            this.useDfsButton.Text = "深さ優先探索を使用";
+            this.useDfsButton.UseVisualStyleBackColor = true;
+            this.useDfsButton.Visible = false;
+            this.useDfsButton.CheckedChanged += new System.EventHandler(this.useDfsButton_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -329,6 +357,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(584, 361);
+            this.Controls.Add(this.useDfsButton);
+            this.Controls.Add(this.useBfsButton);
             this.Controls.Add(this.calculationReject);
             this.Controls.Add(this.goalPosCross);
             this.Controls.Add(this.startPosCross);
@@ -392,5 +422,7 @@
         private System.Windows.Forms.PictureBox startPosCross;
         private System.Windows.Forms.PictureBox goalPosCross;
         private System.Windows.Forms.Button calculationReject;
+        private RadioButton useBfsButton;
+        private RadioButton useDfsButton;
     }
 }

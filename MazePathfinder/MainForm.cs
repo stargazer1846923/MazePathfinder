@@ -66,6 +66,9 @@ namespace MazePathfinder
         /// <summary>mazePathfinderLabel2ƒ‰ƒxƒ‹‚ª”ñ“§–¾‰»‚·‚é‚Ü‚Å‚Ìƒ^ƒCƒ}[</summary>
         private Timer labelToNotClearTimer;
 
+        /// <summary>•—Dæ’Tõ‚ğg—p‚µ‚Ä’Tõ‚·‚é</summary>
+        private bool isUseBfs = true;
+
         /// <summary>‰æ‘œ“Ç‚İ‚İ‚É90“x‰ñ“]‚³‚¹‚é‚©‚Ìc‰¡”ä‚Ìè‡’l</summary>
         const float BITMAP_RATIO = 1.2f;
 
@@ -114,6 +117,12 @@ namespace MazePathfinder
             set { BackgroundImage = value; }
             get { return (Bitmap)BackgroundImage; }
         }
+
+        /// <summary>ƒS[ƒ‹‚Å‚«‚½‚©‚Ç‚¤‚©</summary>
+        public static bool isGoaled = false;
+
+        /// <summary>’Tõ‚ğ’†~‚·‚é</summary>
+        public static bool isCalculationCancel = false;
 
         /// <summary>
         /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
@@ -370,6 +379,8 @@ namespace MazePathfinder
                 startLabel.Visible = true;
                 goalLabel.Visible = true;
                 calculationStartButton.Visible = true;
+                useBfsButton.Visible = true;
+                useDfsButton.Visible = true;
                 palletButton.Visible = true;
                 returnStartButton.Visible = true;
 
@@ -397,6 +408,8 @@ namespace MazePathfinder
                 startPos.Visible = false;
                 goalPos.Visible = false;
                 calculationStartButton.Visible = false;
+                useBfsButton.Visible = false;
+                useDfsButton.Visible = false;
                 palletButton.Visible = false;
                 mazePathfinderLabel2.Visible = false;
                 mazePathfinderLabel1.Visible = true;
@@ -762,11 +775,11 @@ namespace MazePathfinder
             }
 
             mazeImage = (Bitmap)BackgroundImage;
-            int[,] Maze = new int[mazeImage.Size.Height, mazeImage.Size.Width];
+            int[,] maze = new int[mazeImage.Size.Height, mazeImage.Size.Width];
             int x;
             int y;
-            mazeWidth = Maze.GetLength(1) - 1;
-            mazeHeight = Maze.GetLength(0) - 1;
+            mazeWidth = maze.GetLength(1) - 1;
+            mazeHeight = maze.GetLength(0) - 1;
             List<float> imageBrightness = new List<float>();
 
             // ƒ‰ƒ“ƒ_ƒ€ƒT[ƒ`‚Å–¾“x‚Ì•W–{•½‹Ï’l‚ğ‹‚ß‚é
@@ -803,12 +816,12 @@ namespace MazePathfinder
                 {
                     if (imageAbg <= mazeImage.GetPixel(x + 1, y + 1).GetBrightness())
                     {
-                        Maze[y, x] = boolBritness;
+                        maze[y, x] = boolBritness;
                         countWall++;
                     }
                     else
                     {
-                        Maze[y, x] = Math.Abs(boolBritness - 1);
+                        maze[y, x] = Math.Abs(boolBritness - 1);
                         countRoute++;
                     }
                 }
@@ -827,7 +840,7 @@ namespace MazePathfinder
             {
                 for (x = 0; x < mazeWidth - 1; x++)
                 {
-                    if ((Maze[y, x] - Maze[y, x + 1]) == -1 || (Maze[y, x] - Maze[y, x + 1]) == 1)
+                    if ((maze[y, x] - maze[y, x + 1]) == -1 || (maze[y, x] - maze[y, x + 1]) == 1)
                     {
                         countWall++;
                     }
@@ -859,7 +872,7 @@ namespace MazePathfinder
             {
                 x = RandomDigit.GetRandomNumber(mazeWidth - 2);
                 y = RandomDigit.GetRandomNumber(mazeHeight - 2);
-                if (Maze[y, x] == 1)
+                if (maze[y, x] == 1)
                 {
                     imageR.Add(mazeImage.GetPixel(x, y).R);
                     imageG.Add(mazeImage.GetPixel(x, y).G);
@@ -880,6 +893,8 @@ namespace MazePathfinder
             mazePathfinderLabel3.Visible = true;
             loadingNow.Visible = true;
             calculationStartButton.Visible = false;
+            useBfsButton.Visible = false;
+            useDfsButton.Visible = false;
             palletButton.Visible = false;
             returnStartButton.Visible = false;
 
@@ -889,20 +904,22 @@ namespace MazePathfinder
             // ƒeƒLƒXƒgƒf[ƒ^Å“K‰»
             await Task.Run(() =>
             {
-                FindStartPosition(Maze);
-                FindGoalPosition(Maze);
+                FindStartPosition(maze);
+                FindGoalPosition(maze);
             });
 
             // ’†~‚µ‚½ê‡A’Tõ‚ğ’†~‚·‚é
-            if (MazeSolver.isCalculationCancel == true)
+            if (isCalculationCancel == true)
             {
-                MazeSolver.isCalculationCancel = false;
+                isCalculationCancel = false;
                 MessageBox.Show("–À˜H‚Ì’Tõˆ—‚ğ’†~‚µ‚Ü‚µ‚½B", "MazePathfinder", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 calculationReject.Visible = false;
                 mazePathfinderLabel2.Visible = true;
                 mazePathfinderLabel3.Visible = false;
                 loadingNow.Visible = false;
                 calculationStartButton.Visible = true;
+                useBfsButton.Visible = true;
+                useDfsButton.Visible = true;
                 palletButton.Visible = true;
                 returnStartButton.Visible = true;
                 StartAndGoalPosImageEnabled(true);
@@ -917,6 +934,8 @@ namespace MazePathfinder
                 mazePathfinderLabel3.Visible = false;
                 loadingNow.Visible = false;
                 calculationStartButton.Visible = true;
+                useBfsButton.Visible = true;
+                useDfsButton.Visible = true;
                 palletButton.Visible = true;
                 returnStartButton.Visible = true;
                 StartAndGoalPosImageEnabled(true);
@@ -926,20 +945,32 @@ namespace MazePathfinder
             // •—Dæ’Tõ‚ÅÅ’ZŒo˜H‚ğ‹‚ß‚é
             await Task.Run(() => 
             {
-                MazeSolver bfs = new MazeSolver(Maze, startPosition.X, startPosition.Y, goalPosition.X, goalPosition.Y);
-                bfs.Search();
+                if(isUseBfs == true)
+                {
+                    // •—Dæ’Tõ
+                    MazeSolver.MazeSolverForBfs bfs = new MazeSolver.MazeSolverForBfs(maze, startPosition.X, startPosition.Y, goalPosition.X, goalPosition.Y);
+                    bfs.Search();
+                }
+                else
+                {
+                    // [‚³—Dæ’Tõ
+                    MazeSolver.MazeSolverForDfs dfs = new MazeSolver.MazeSolverForDfs(maze, startPosition.X, startPosition.Y, goalPosition.X, goalPosition.Y);
+                    dfs.Search();
+                }
             });
 
             // ’†~‚µ‚½ê‡A’Tõ‚ğ’†~‚·‚é
-            if (MazeSolver.isCalculationCancel == true)
+            if (isCalculationCancel == true)
             {
-                MazeSolver.isCalculationCancel = false;
+                isCalculationCancel = false;
                 MessageBox.Show("–À˜H‚Ì’Tõˆ—‚ğ’†~‚µ‚Ü‚µ‚½B", "MazePathfinder", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 calculationReject.Visible = false;
                 mazePathfinderLabel2.Visible = true;
                 mazePathfinderLabel3.Visible = false;
                 loadingNow.Visible = false;
                 calculationStartButton.Visible = true;
+                useBfsButton.Visible = true;
+                useDfsButton.Visible = true;
                 palletButton.Visible = true;
                 returnStartButton.Visible = true;
                 StartAndGoalPosImageEnabled(true);
@@ -954,7 +985,7 @@ namespace MazePathfinder
             returnStartButton.Location = new Point(104, ClientSize.Height - 40);
 
             // ƒS[ƒ‹‚µ‚½ê‡
-            if (MazeSolver.isGoaled == true)
+            if (isGoaled == true)
             {
                 // Å’ZŒo˜Hã‚ÌF‚ğ‹‚ß‚é
                 imageR.Clear();
@@ -964,7 +995,7 @@ namespace MazePathfinder
                 {
                     for (x = 0; x < mazeWidth - 1; x++)
                     {
-                        if (Maze[y, x] == 2)
+                        if (maze[y, x] == 2)
                         {
                             imageR.Add(mazeImage.GetPixel(x, y).R);
                             imageG.Add(mazeImage.GetPixel(x, y).G);
@@ -1002,7 +1033,7 @@ namespace MazePathfinder
                 {
                     for (x = 0; x < mazeWidth - 1; x++)
                     {
-                        if (Maze[y, x] == 2)
+                        if (maze[y, x] == 2)
                         {
                             mazeImage.SetPixel(x, y, solvedColor);
                             if (x != mazeWidth - 1)
@@ -1062,7 +1093,7 @@ namespace MazePathfinder
         /// <param name="e"></param>
         private void CalculationReject_Click(object sender, EventArgs e)
         {
-            MazeSolver.isCalculationCancel = true;
+            isCalculationCancel = true;
             return;
         }
 
@@ -1122,6 +1153,8 @@ namespace MazePathfinder
             mazePathfinderLabel3.Visible = false;
             loadingNow.Visible = false;
             calculationStartButton.Visible = true;
+            useBfsButton.Visible = true;
+            useDfsButton.Visible = true;
             palletButton.Visible = true;
             mazePathfinderLabel1.Visible = false;
             mazePathfinderPictureBox.Visible = false;
@@ -1189,6 +1222,8 @@ namespace MazePathfinder
             mazePathfinderLabel3.Visible = false;
             loadingNow.Visible = false;
             calculationStartButton.Visible = false;
+            useBfsButton.Visible = false;
+            useDfsButton.Visible = false;
             palletButton.Visible = false;
             mazePathfinderLabel2.Visible = false;
             mazePathfinderLabel1.Visible = true;
@@ -1243,7 +1278,7 @@ namespace MazePathfinder
                         }
 
                         // ’†~‚µ‚½ê‡A’Tõ‚ğ’†~‚·‚é
-                        if (MazeSolver.isCalculationCancel == true)
+                        if (isCalculationCancel == true)
                         {
                             return;
                         }
@@ -1294,7 +1329,7 @@ namespace MazePathfinder
                         }
 
                         // ’†~‚µ‚½ê‡A’Tõ‚ğ’†~‚·‚é
-                        if (MazeSolver.isCalculationCancel == true)
+                        if (isCalculationCancel == true)
                         {
                             return;
                         }
@@ -1316,6 +1351,28 @@ namespace MazePathfinder
             }
             goalPosition.X = 0;
             goalPosition.Y = 0;
+            return;
+        }
+
+        /// <summary>
+        /// •—Dæ’Tõ‚ğg—p‚·‚é
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void useBfsButton_CheckedChanged(object sender, EventArgs e)
+        {
+            isUseBfs = true;
+            return;
+        }
+
+        /// <summary>
+        /// [‚³—Dæ’Tõ‚ğg—p‚·‚é
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void useDfsButton_CheckedChanged(object sender, EventArgs e)
+        {
+            isUseBfs = false;
             return;
         }
     }
